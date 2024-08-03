@@ -1,9 +1,17 @@
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Mul, Sub}; // I wouldn't know how division works for time so I skipped that
+
+/*
+* making my own time format because I can in here I define simple arithmetic functions for the time
+* struct to just make code more readable allowing for Time + Time rather than having to do things
+* like Time.add(Time)
+*/
+
 #[derive(Debug, Copy, Clone)]
 pub struct Time {
     pub minute: u8,
     pub hour: u8,
 }
+
 impl Add for Time {
     type Output = Time;
 
@@ -96,6 +104,8 @@ impl Time {
     }
 }
 
+// this will probably not needed after I managed to create an actual gui for this (this was an
+// absolute pain figuring out how to do this)
 impl std::fmt::Display for Time {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let width = f.width().unwrap_or(0);
