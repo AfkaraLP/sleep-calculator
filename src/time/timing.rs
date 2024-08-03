@@ -38,6 +38,21 @@ impl Sub for Time {
     }
 }
 
+impl Mul<Time> for u8 {
+    type Output = Time;
+
+    fn mul(self, rhs: Time) -> Self::Output {
+        let total_minutes = (rhs.hour as u32 * 60 + rhs.minute as u32) * self as u32;
+        let new_hours = (total_minutes / 60) % 24;
+        let new_minutes = total_minutes % 60;
+
+        Time {
+            hour: new_hours as u8,
+            minute: new_minutes as u8,
+        }
+    }
+}
+
 impl Mul<u8> for Time {
     type Output = Time;
 
