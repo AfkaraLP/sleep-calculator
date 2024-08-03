@@ -46,7 +46,7 @@ fn main() {
         }
 
         println!(
-            "| for {} sleep cycles you have to to bed at {} (in {}){:<7}|",
+            "| for {} sleep cycles you have to go to bed at {} (in {}){:<4}|",
             sleep_cycle, time_to_fall_asleep, time_till_fall_asleep, ""
         );
     }
