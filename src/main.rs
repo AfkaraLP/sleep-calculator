@@ -14,7 +14,9 @@ fn main() {
     let local_time = Local::now().format("%H:%M").to_string();
     let local_time: Time = Time::from_string(local_time);
 
-    let argument = args().nth(1).expect("no argument provided");
+    let argument = args()
+        .nth(1)
+        .expect("read the argument provided at compile time");
     let desired_time = Time::from_string(argument);
 
     println!("\n\n");

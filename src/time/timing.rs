@@ -84,21 +84,23 @@ impl Time {
                     .as_str()
                     .split(":")
                     .nth(1)
-                    .expect("couldn't get first element")
+                    .expect("get the minutes of the input string")
                     .parse::<u8>()
-                    .expect("couldn't read number"),
+                    .expect("convert the minutes of the input string to u8"),
                 hour: input
                     .as_str()
                     .split(":")
                     .nth(0)
-                    .expect("couldn't get first element")
+                    .expect("get the hours of the input string")
                     .parse::<u8>()
-                    .expect("couldn't convert to u8"),
+                    .expect("convert the hours of the input string to u8"),
             }
         } else {
             Time {
                 minute: 0,
-                hour: input.parse::<u8>().expect("couldn't read number"),
+                hour: input.parse::<u8>().expect(
+                    "convert the input string into hours in u8 when no minutes are provided",
+                ),
             }
         }
     }
