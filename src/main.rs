@@ -60,11 +60,12 @@ impl eframe::App for MyApp {
 
             ui.label(format!("current time is: {}",Local::now().format("%H:%M").to_string()));
 
+            let local_time = Local::now().format("%H:%M").to_string();
+            
             if self.is_valid_time_format() {
 
                 let desired_time = Time::from_string(self.desired_time.clone());
 
-                let local_time = Local::now().format("%H:%M").to_string();
 
                 for sleep_cycle in 1..10 {
                     let time_to_subtract = Time {
@@ -87,6 +88,8 @@ impl eframe::App for MyApp {
                     ui.label(message);
                 }
 
+            }
+
                 ui.heading("If you go to bed right now");
 
                 for sleep_cycle in 1..10 {
@@ -102,7 +105,6 @@ impl eframe::App for MyApp {
                     ui.label(message);
 
                 }
-            }
         });
     }
 }
