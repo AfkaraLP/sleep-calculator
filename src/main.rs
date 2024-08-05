@@ -4,55 +4,87 @@ mod time;
 // used to get the local time
 use chrono::Local;
 
-// used to get the input from the command line when running the program, will be deprecated once
-// the gui has been done
-use std::env::args;
+// pattern matching
+use regex::Regex;
 
 use time::timing::Time;
 
-fn main() {
-    let local_time = Local::now().format("%H:%M").to_string();
-    let local_time: Time = Time::from_string(local_time);
+use eframe::egui;
 
-    let argument = args()
-        .nth(1)
-        .expect("read the argument provided at compile time");
-    let desired_time = Time::from_string(argument);
+fn main() -> eframe::Result {
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default().with_inner_size([720.0, 240.0]),
+        ..Default::default()
+    };
 
-    println!("\n\n");
-    println!("+-----------------------------------------------------------------+");
-    println!("| if you want to wake up at {:<38}|", desired_time);
-    println!("+-----------------------------------------------------------------+");
-    for sleep_cycle in 1..10 {
-        // from my research 1 sleep cycle is 90 minutes long, that means I will subtract n * 90
-        // minutes for the nth sleep cycle
-        let time_to_subtract = Time {
-            hour: 1,
-            minute: 30,
-        } * (sleep_cycle as u8);
+    eframe::run_native(
+        "Sleep Calculator",
+        options,
+        Box::new(|cc| {
+            egui_extras::install_image_loaders(&cc.egui_ctx);
+            Ok(Box::<MyApp>::default())
+        }),
+    )
+}
 
-        let time_to_fall_asleep = desired_time - time_to_subtract;
+struct MyApp {
+    desired_time: String,
+}
 
-        // here I subtract the time it takes a person on average to fall asleep (once the gui is
-        // done this will probably be a toggle or I will display both values)
-        let time_to_fall_asleep = time_to_fall_asleep - Time::from_string("00:14".to_string());
-        let time_till_fall_asleep = time_to_fall_asleep - local_time;
-
-        // we ignore any bedtime that is more than 12 hours from now because that'd just be the
-        // bedtime for the next day then (though now writing this if someone is planning ahead
-        // their sleep this just kinda works against them)
-        if time_till_fall_asleep.hour > 12 {
-            continue;
-        }
-
-        println!(
-            "| for {} sleep cycles you have to go to bed at {} (in {}){:<4}|",
-            sleep_cycle, time_to_fall_asleep, time_till_fall_asleep, ""
-        );
+impl MyApp {
+    fn is_valid_time_format(&self) -> bool {
+        let re = Regex::new(r"^([01]?\d|2[0-3]):[0-5]\d$|^([01]?\d|2[0-3])$").unwrap();
+        re.is_match(&self.desired_time)
     }
+}
 
-    println!("+-----------------------------------------------------------------+");
-    println!("| current time is: {:<47}|", local_time);
-    println!("+-----------------------------------------------------------------+");
-    println!("\n\n");
+impl Default for MyApp {
+    fn default() -> Self {
+        Self {
+            desired_time: "00:00".to_string(),
+        }
+    }
+}
+
+impl eframe::App for MyApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Sleep Calculator");
+
+            ui.horizontal(|ui| {
+                let something_label = ui.label("Your Desired Time To Wake Up");
+                ui.text_edit_singleline(&mut self.desired_time)
+                    .labelled_by(something_label.id)
+            });
+
+            ui.label(format!("current time is: {}",Local::now().format("%H:%M").to_string()));
+
+            if self.is_valid_time_format() {
+
+            let desired_time = Time::from_string(self.desired_time.clone());
+
+                for sleep_cycle in 1..10 {
+                    let time_to_subtract = Time {
+                        hour: 1,
+                        minute: 30,
+                    } * sleep_cycle as u8;
+
+                    let time_to_fall_asleep = desired_time - time_to_subtract;
+
+                    let local_time = Local::now().format("%H:%M").to_string();
+                    let time_to_fall_asleep =
+                        time_to_fall_asleep - Time::from_string("00:14".to_string());
+                    let time_till_fall_asleep = time_to_fall_asleep - Time::from_string(local_time);
+
+                    if time_till_fall_asleep.hour > 12 {
+                        continue;
+                    }
+
+                    let message = format!("if you want to fall asleep at your desired time with {} cycles of sleep you will have to go to bed at {} which is in {}", sleep_cycle, time_to_fall_asleep, time_till_fall_asleep);
+
+                    ui.label(message);
+                }
+            }
+        });
+    }
 }

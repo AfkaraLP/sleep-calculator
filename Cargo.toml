@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
+eframe = "0.28.1"
+egui_extras = "0.28.1"
+regex = "1.10.6"
