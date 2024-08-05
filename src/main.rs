@@ -58,14 +58,39 @@ impl eframe::App for MyApp {
                     .labelled_by(something_label.id)
             });
 
-            ui.label(format!("current time is: {}",Local::now().format("%H:%M").to_string()));
+            ui.label(format!(
+                "current time is: {}",
+                Local::now().format("%H:%M").to_string()
+            ));
 
             let local_time = Local::now().format("%H:%M").to_string();
-            
+
+            ui.heading("If you go to bed right now");
+
+            for sleep_cycle in 1..10 {
+                let time_to_add = Time {
+                    hour: 1,
+                    minute: 30,
+                } * sleep_cycle as u8
+                    + Time {
+                        hour: 0,
+                        minute: 14,
+                    };
+
+                let time_to_wake_up = Time::from_string(local_time.clone()) + time_to_add;
+
+                let message = format!(
+                    "if you go to bed right now you can wake up at {} for {} sleep cycles",
+                    time_to_wake_up, sleep_cycle
+                );
+
+                ui.label(message);
+            }
+
+            ui.heading("to wake up at your desired time");
+
             if self.is_valid_time_format() {
-
                 let desired_time = Time::from_string(self.desired_time.clone());
-
 
                 for sleep_cycle in 1..10 {
                     let time_to_subtract = Time {
@@ -77,34 +102,21 @@ impl eframe::App for MyApp {
 
                     let time_to_fall_asleep =
                         time_to_fall_asleep - Time::from_string("00:14".to_string());
-                    let time_till_fall_asleep = time_to_fall_asleep - Time::from_string(local_time.clone());
+                    let time_till_fall_asleep =
+                        time_to_fall_asleep - Time::from_string(local_time.clone());
 
                     if time_till_fall_asleep.hour > 12 {
                         continue;
                     }
 
-                    let message = format!("if you want to fall asleep at your desired time with {} cycles of sleep you will have to go to bed at {} which is in {}", sleep_cycle, time_to_fall_asleep, time_till_fall_asleep);
+                    let message = format!(
+                        "for {} cycles of sleep you will have to go to bed at {} which is in {}",
+                        sleep_cycle, time_to_fall_asleep, time_till_fall_asleep
+                    );
 
                     ui.label(message);
                 }
-
             }
-
-                ui.heading("If you go to bed right now");
-
-                for sleep_cycle in 1..10 {
-                    let time_to_add = Time {
-                        hour: 1,
-                        minute: 30,
-                    } * sleep_cycle as u8 + Time {hour: 0, minute: 14};
-
-                    let time_to_wake_up = Time::from_string(local_time.clone()) + time_to_add;
-
-                    let message = format!("if you go to bed right now you can wake up at {} for {} sleep cycles", time_to_wake_up, sleep_cycle);
-
-                    ui.label(message);
-
-                }
         });
     }
 }
